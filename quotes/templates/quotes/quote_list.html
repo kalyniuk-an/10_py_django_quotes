@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quotes</title>
+</head>
+<body>
+    <h1>Quotes</h1>
+    <h2>Top 10 Tags</h2>
+
+    <ul>
+        {% for tag in top_tags %}
+            <li>
+                <a href="{% url 'tag_quotes' tag.name %}">
+                    {{ tag.name }}
+                </a>
+                — {{ tag.quote_count }}
+            </li>
+        {% endfor %}
+    </ul>
+    {% if tag_name %}
+        <h2>Quotes with tag: {{ tag_name }}</h2>
+    {% endif %}
+
+    {% for quote in page_obj %}
+        <div>
+            <p>{{ quote.text }}</p>
+
+            <p>
+                <strong>
+                    <a href="{% url 'author_detail' quote.author.fullname %}">
+                        {{ quote.author.fullname }}
+                    </a>
+                </strong>
+            </p>
+
+            <p>
+                Tags:
+                {% for tag in quote.tags.all %}
+                    <a href="{% url 'tag_quotes' tag.name %}">
+                        {{ tag.name }}
+                    </a>
+                {% endfor %}
+            </p>
+        </div>
+
+        <hr>
+    {% endfor %}
+
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+</body>
+</html>

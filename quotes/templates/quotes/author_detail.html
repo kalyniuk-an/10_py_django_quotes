@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ author.fullname }}</title>
+</head>
+<body>
+    <h1>{{ author.fullname }}</h1>
+
+    <p>
+        <strong>Born:</strong>
+        {{ author.born_date }}
+    </p>
+
+    <p>
+        <strong>Born location:</strong>
+        {{ author.born_location }}
+    </p>
+
+    <p>
+        <strong>About:</strong>
+        {{ author.description }}
+    </p>
+
+    <h2>Quotes</h2>
+
+    {% for quote in quotes %}
+        <div>
+            <p>{{ quote.text }}</p>
+
+            <p>
+                Tags:
+                {% for tag in quote.tags.all %}
+                    <a href="{% url 'tag_quotes' tag.name %}">
+                        {{ tag.name }}
+                    </a>
+                {% endfor %}
+            </p>
+        </div>
+
+        <hr>
+    {% empty %}
+        <p>No quotes found.</p>
+    {% endfor %}
+
+    <a href="{% url 'quote_list' %}">Back to quotes</a>
+</body>
+</html>
