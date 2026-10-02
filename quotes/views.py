@@ -3,8 +3,9 @@ from django.shortcuts import redirect
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
 
-from .forms import RegisterForm
+from .forms import AuthorForm, QuoteForm, RegisterForm
 from .models import Author, Quote, Tag
 
 
@@ -42,12 +43,17 @@ def tag_quotes(request, tag_name):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    top_tags = Tag.objects.annotate(
+        quote_count=Count("quotes")
+    ).order_by("-quote_count")[:10]
+
     return render(
         request,
         "quotes/quote_list.html",
         {
             "page_obj": page_obj,
             "tag_name": tag_name,
+            "top_tags": top_tags,
         },
     )
 
@@ -81,5 +87,39 @@ def register(request):
     return render(
         request,
         "registration/register.html",
+        {"form": form},
+    )
+
+@login_required
+def add_author(request):
+    if request.method == "POST":
+        form = AuthorForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect("quote_list")
+    else:
+        form = AuthorForm()
+
+    return render(
+        request,
+        "quotes/add_author.html",
+        {"form": form},
+    )
+
+@login_required
+def add_quote(request):
+    if request.method == "POST":
+        form = QuoteForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect("quote_list")
+    else:
+        form = QuoteForm()
+
+    return render(
+        request,
+        "quotes/add_quote.html",
         {"form": form},
     )
